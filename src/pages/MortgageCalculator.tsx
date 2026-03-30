@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Home, Percent, Calendar, DollarSign, TrendingDown } from "lucide-react";
 import { PieChart as RechartPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { toast } from "sonner"; // or "react-hot-toast" depending on your setup
 
 const MortgageCalculator = () => {
   const [homePrice, setHomePrice] = useState(500000);
@@ -38,7 +39,29 @@ const MortgageCalculator = () => {
     { name: "Principal", value: stats.principal, color: "#10b981" },
     { name: "Total Interest", value: stats.totalInterest, color: "#f43f5e" },
   ];
+  const [scenarios, setScenarios] = useState<any[]>([]);
 
+  const saveScenario = () => {
+          if (scenarios.length >= 3) {
+            toast.error("Max 3 scenarios for comparison. Remove one to add more!");
+            return;
+          }
+          
+          const newScenario = {
+            id: Date.now(),
+            homePrice,
+            monthlyPayment: stats.monthlyPayment,
+            gds: qualification.gds,
+            isQualified: qualification.isQualified,
+          };
+          
+          setScenarios([...scenarios, newScenario]);
+          toast.success("Scenario saved for comparison!");
+        };
+        
+        const removeScenario = (id: number) => {
+          setScenarios(scenarios.filter(s => s.id !== id));
+      };  
   return (
     <div className="max-w-6xl mx-auto p-6 fade-in-up">
       <header className="mb-10 text-center">
@@ -91,9 +114,15 @@ const MortgageCalculator = () => {
         <div className="space-y-6">
           <div className="bg-primary rounded-2xl p-8 text-white shadow-xl shadow-blue-200 transition-transform hover:scale-[1.02] duration-300">
             <p className="text-blue-100 font-bold uppercase tracking-widest text-xs">Estimated Monthly Payment</p>
+                        
             <h2 className="text-6xl font-black mt-2">${stats.monthlyPayment.toFixed(2)}</h2>
           </div>
-
+          <Button 
+              onClick={saveScenario} 
+              className="btn-bounce w-full py-6 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-bold shadow-lg shadow-slate-200"
+            >
+              + Save to Compare
+            </Button>  
           <div className="playful-card rounded-2xl p-6">
              <h4 className="font-bold text-slate-500 uppercase text-xs tracking-widest mb-4">Payment Breakdown</h4>
              <div className="h-[250px]">
@@ -112,7 +141,55 @@ const MortgageCalculator = () => {
           </div>
         </div>
       </div>
-    </div>
+      {/* COMPARISON GRID SECTION */}
+      {scenarios.length > 0 && (
+        <div className="mt-12 pt-12 border-t border-slate-200 fade-in-up">
+          <div className="flex justify-between items-end mb-6">
+            <div>
+              <h2 className="text-2xl font-black text-slate-900">Compare Scenarios</h2>
+              <p className="text-slate-500 text-sm">Review your saved options side-by-side.</p>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setScenarios([])} className="text-slate-400 hover:text-rose-500">
+              Clear All
+            </Button>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {scenarios.map((s, index) => (
+              <div key={s.id} className="playful-card relative rounded-2xl p-6 bg-white border-2 border-slate-100">
+                <button 
+                  onClick={() => removeScenario(s.id)}
+                  className="absolute top-3 right-3 text-slate-300 hover:text-rose-500 text-xl font-bold"
+                >
+                  ×
+                </button>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Option {index + 1}</p>
+                <p className="text-xl font-black text-slate-800">${s.homePrice.toLocaleString()}</p>
+                
+                <div className="mt-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">Monthly:</span>
+                    <span className="font-bold text-slate-800">${s.monthlyPayment.toFixed(0)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">GDS Ratio:</span>
+                    <span className={`font-bold ${s.isQualified ? "text-emerald-500" : "text-rose-500"}`}>
+                      {s.gds.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+                
+                <div className={`mt-4 py-2 text-center rounded-lg text-[10px] font-bold uppercase tracking-tighter ${
+                  s.isQualified ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
+                }`}>
+                  {s.isQualified ? "Likely Qualified" : "High Risk"}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div> // This is the end of the main container
   );
 };
 
