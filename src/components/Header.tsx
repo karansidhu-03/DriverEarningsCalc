@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const navItems = [
   { to: "/", label: "Dashboard" },
+  { to: "/mortgage-calculator", label: "Mortgage" },
   { to: "/uber-earnings-calculator", label: "Uber" },
   { to: "/lyft-earnings-calculator", label: "Lyft" },
   { to: "/doordash-earnings-calculator", label: "DoorDash" },
