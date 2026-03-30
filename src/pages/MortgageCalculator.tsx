@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Home, Percent, Calendar, DollarSign, TrendingDown } from "lucide-react";
 import { PieChart as RechartPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { toast } from "sonner"; // or "react-hot-toast" depending on your setup
+import { Button } from "@/components/ui/button";
 
 const MortgageCalculator = () => {
   const [homePrice, setHomePrice] = useState(500000);
