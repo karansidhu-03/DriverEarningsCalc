@@ -73,6 +73,7 @@ const Dashboard = () => (
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
+              { to: "/mortgage-calculator", label: "Mortgage Planner" },
               { to: "/uber-earnings-calculator", label: "Uber" },
               { to: "/lyft-earnings-calculator", label: "Lyft" },
               { to: "/doordash-earnings-calculator", label: "DoorDash" },
